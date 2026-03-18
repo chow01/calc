@@ -176,7 +176,8 @@ body {
 ══════════════════════════════════════════ */
 #p1 { background: var(--bg); }
 
-.eq-list { flex:1; padding:12px 14px 4px; display:flex; flex-direction:column; gap:0; }
+.eq-list { flex:1; min-height:0; padding:12px 14px 4px; display:flex; flex-direction:column; gap:0; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.eq-list::-webkit-scrollbar { display:none; }
 
 @keyframes slidedown {
   from { opacity:0; transform:translateY(-6px); }
@@ -267,6 +268,8 @@ body {
   gap: 6px;
   padding: 8px 14px 6px;
   flex-shrink: 0;
+  background: var(--canvas);
+  border-bottom: 1px solid var(--border);
 }
 .fmt-label {
   font-family: var(--ui);
@@ -304,16 +307,26 @@ body {
   font-weight: 700;
 }
 .fmt-btn:not(.on):active { background: var(--accent-xl); color: var(--accent); }
-  display:none; flex-wrap:wrap; gap:6px;
-  padding:0 14px 10px; flex-shrink:0;
+
+.var-summary {
+  display: none;
+  flex-wrap: nowrap;
+  gap: 6px;
+  padding: 0 14px 10px;
+  flex-shrink: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
-.var-summary.on { display:flex; }
+.var-summary::-webkit-scrollbar { display: none; }
+.var-summary.on { display: flex; }
 .vb {
   background: var(--s1);
   border: 1.5px solid var(--border2);
   border-radius: 20px; padding:4px 10px;
   font-family: var(--mono); font-size:11px; font-weight:500;
   color: var(--accent);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* Footer */
@@ -348,7 +361,8 @@ body {
    PAGE 2 — UNIT CONVERTER
 ══════════════════════════════════════════ */
 #p2 { background: var(--bg); }
-.uc-body { flex:1; padding:10px 14px; gap:8px; display:flex; flex-direction:column; }
+.uc-body { flex:1; min-height:0; padding:10px 14px; gap:8px; display:flex; flex-direction:column; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.uc-body::-webkit-scrollbar { display:none; }
 
 .uc-card {
   background: var(--s1);
@@ -529,7 +543,7 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-width: 0;
+  min-width: 44px;
   border-right: 1px solid var(--border);
 }
 .colour-field-wrap:last-child { border-right: none; }
@@ -846,7 +860,7 @@ body {
       <button class="fmt-btn" onclick="setFmt('decimal')">Decimal</button>
     </div>
   </div>
-  <div class="scroll eq-list" id="eq-list"></div>
+  <div class="eq-list" id="eq-list"></div>
   <div class="var-summary" id="var-summary"></div>
   <div class="eq-foot">
     <button class="btn-add" onclick="addEq()">+ Equation</button>
@@ -857,7 +871,7 @@ body {
 <!-- PAGE 2: UNIT CONVERTER -->
 <div id="p2" class="page">
   <div class="ph"><div class="ph-title">Unit <em>Converter</em></div></div>
-  <div class="scroll uc-body" id="uc-body"></div>
+  <div class="uc-body" id="uc-body"></div>
 </div>
 
 <!-- PAGE 3: SCRIPT RUNNER -->
@@ -1404,10 +1418,10 @@ function buildUC(){
             '<div class="colour-row">'+
               '<div class="colour-tag">CMYK</div>'+
               '<div class="colour-fields">'+
-                '<div class="colour-field-wrap"><div class="colour-field-lbl">C%</div><input class="colour-field-in" id="col-c" type="number" min="0" max="100" inputmode="decimal" placeholder="76" oninput="colourConv(\'cmyk\')"></div>'+
-                '<div class="colour-field-wrap"><div class="colour-field-lbl">M%</div><input class="colour-field-in" id="col-m" type="number" min="0" max="100" inputmode="decimal" placeholder="31" oninput="colourConv(\'cmyk\')"></div>'+
-                '<div class="colour-field-wrap"><div class="colour-field-lbl">Y%</div><input class="colour-field-in" id="col-y" type="number" min="0" max="100" inputmode="decimal" placeholder="0" oninput="colourConv(\'cmyk\')"></div>'+
-                '<div class="colour-field-wrap"><div class="colour-field-lbl">K%</div><input class="colour-field-in" id="col-k" type="number" min="0" max="100" inputmode="decimal" placeholder="14" oninput="colourConv(\'cmyk\')"></div>'+
+                '<div class="colour-field-wrap"><div class="colour-field-lbl">C%</div><input class="colour-field-in" id="col-cm" type="number" min="0" max="100" inputmode="decimal" placeholder="76" oninput="colourConv(\'cmyk\')"></div>'+
+                '<div class="colour-field-wrap"><div class="colour-field-lbl">M%</div><input class="colour-field-in" id="col-mm" type="number" min="0" max="100" inputmode="decimal" placeholder="31" oninput="colourConv(\'cmyk\')"></div>'+
+                '<div class="colour-field-wrap"><div class="colour-field-lbl">Y%</div><input class="colour-field-in" id="col-ym" type="number" min="0" max="100" inputmode="decimal" placeholder="0" oninput="colourConv(\'cmyk\')"></div>'+
+                '<div class="colour-field-wrap"><div class="colour-field-lbl">K%</div><input class="colour-field-in" id="col-km" type="number" min="0" max="100" inputmode="decimal" placeholder="14" oninput="colourConv(\'cmyk\')"></div>'+
               '</div>'+
             '</div>'+
           '</div>'+
@@ -1596,10 +1610,10 @@ function colourConv(source){
     const b=parseFloat(document.getElementById('col-bb').value);
     if(!isNaN(h)&&!isNaN(s)&&!isNaN(b)) rgb=hsbToRgb(h,s,b);
   } else if(source==='cmyk'){
-    const c=parseFloat(document.getElementById('col-c').value);
-    const m=parseFloat(document.getElementById('col-m').value);
-    const y=parseFloat(document.getElementById('col-y').value);
-    const k=parseFloat(document.getElementById('col-k').value);
+    const c=parseFloat(document.getElementById('col-cm').value);
+    const m=parseFloat(document.getElementById('col-mm').value);
+    const y=parseFloat(document.getElementById('col-ym').value);
+    const k=parseFloat(document.getElementById('col-km').value);
     if(!isNaN(c)&&!isNaN(m)&&!isNaN(y)&&!isNaN(k)) rgb=cmykToRgb(c,m,y,k);
   }
 
@@ -1632,10 +1646,10 @@ function colourFill(r,g,b,skip){
     document.getElementById('col-bb').value=hsb.b;
   }
   if(skip!=='cmyk'){
-    document.getElementById('col-c').value=cmyk.c;
-    document.getElementById('col-m').value=cmyk.m;
-    document.getElementById('col-y').value=cmyk.y;
-    document.getElementById('col-k').value=cmyk.k;
+    document.getElementById('col-cm').value=cmyk.c;
+    document.getElementById('col-mm').value=cmyk.m;
+    document.getElementById('col-ym').value=cmyk.y;
+    document.getElementById('col-km').value=cmyk.k;
   }
 
   // Update swatch
