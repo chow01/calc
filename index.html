@@ -412,10 +412,149 @@ body {
 }
 .uc-swap:active { background:var(--accent); color:#fff; transform:rotate(180deg) scale(1.1); }
 
-/* ══════════════════════════════════════════
-   PAGE 3 — SCRIPT RUNNER
-══════════════════════════════════════════ */
-#p3 { background: var(--bg); }
+/* Base number converter */
+.base-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.base-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--rsm);
+  background: var(--s2);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.base-row:focus-within { border-color: var(--accent); }
+.base-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  background: var(--s3);
+  border-right: 1px solid var(--border);
+  padding: 10px 11px;
+  min-width: 48px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.base-in {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  padding: 10px 12px;
+  min-width: 0;
+  letter-spacing: 0.04em;
+}
+.base-in::placeholder { color: var(--text3); font-size: 12px; font-weight: 400; }
+
+/* Colour converter */
+.colour-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Swatch preview */
+.colour-swatch {
+  height: 48px;
+  border-radius: var(--rsm);
+  background: #3498db;
+  border: 1.5px solid var(--border);
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+/* Each format row */
+.colour-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1.5px solid var(--border);
+  border-radius: var(--rsm);
+  background: var(--s2);
+  overflow: hidden;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.colour-row:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(245,130,13,0.12);
+}
+
+.colour-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  background: var(--s3);
+  border-right: 1.5px solid var(--border);
+  padding: 10px 10px;
+  min-width: 52px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.colour-in {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  padding: 10px 12px;
+  min-width: 0;
+  letter-spacing: 0.04em;
+}
+.colour-in::placeholder { color: var(--text3); font-size: 12px; font-weight: 400; }
+
+/* Multi-field rows (RGB, HSL, HSB, CMYK) */
+.colour-fields {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+.colour-field-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-right: 1px solid var(--border);
+}
+.colour-field-wrap:last-child { border-right: none; }
+.colour-field-lbl {
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  padding: 4px 8px 0;
+  text-transform: uppercase;
+}
+.colour-field-in {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  padding: 3px 8px 8px;
+  min-width: 0;
+  width: 100%;
+}
+.colour-field-in::placeholder { color: var(--text3); }
 
 /* Script tabs */
 .stabs {
@@ -1188,52 +1327,321 @@ const UC=[
   {t:'Speed',    u:['m/s','km/h','mph','knot'],              b:{'m/s':1,'km/h':1/3.6,mph:.44704,knot:.514444}},
   {t:'Time',     u:['ms','s','min','h','day','wk','yr'],     b:{ms:.001,s:1,min:60,h:3600,day:86400,wk:604800,yr:31536000}},
   {t:'Data',     u:['bit','B','KB','MB','GB','TB'],          b:{bit:1,B:8,KB:8192,MB:8388608,GB:8589934592,TB:8796093022208}},
+  {t:'Base',     base:true},
+  {t:'Colour',   colour:true},
 ];
 function ctmp(v,f,t){let c;if(f==='C')c=v;else if(f==='F')c=(v-32)/1.8;else c=v-273.15;if(t==='C')return c;if(t==='F')return c*1.8+32;return c+273.15;}
+
 function buildUC(){
   const body=document.getElementById('uc-body');body.innerHTML='';
   UC.forEach((cat,ci)=>{
     const card=document.createElement('div');card.className='uc-card';
-    const opts=si=>cat.u.map((u,i)=>'<option value="'+u+'"'+(i===si?' selected':'')+'>'+u+'</option>').join('');
-    card.innerHTML=
-      '<div class="uc-head" onclick="togUC('+ci+')">'+cat.t+'<span class="uc-chev">v</span></div>'+
-      '<div class="uc-inner">'+
-        '<div class="uc-row">'+
-          '<div class="uc-grp">'+
-            '<div class="uc-lbl">From</div>'+
-            '<div class="uc-field">'+
-              '<input class="uc-num" id="uf'+ci+'" type="number" value="1" inputmode="decimal" oninput="ucv('+ci+',1)">'+
-              '<select class="uc-sel" id="us'+ci+'" onchange="ucv('+ci+',1)">'+opts(0)+'</select>'+
+    if(cat.base){
+      // Special base-converter card — shows all 4 bases simultaneously
+      card.innerHTML=
+        '<div class="uc-head" onclick="togUC('+ci+')">Base Converter<span class="uc-chev">v</span></div>'+
+        '<div class="uc-inner">'+
+          '<div class="base-grid">'+
+            '<div class="base-row">'+
+              '<div class="base-tag">DEC</div>'+
+              '<input class="base-in" id="base-dec" inputmode="numeric" placeholder="255" oninput="baseConv(\'dec\')">'+
+            '</div>'+
+            '<div class="base-row">'+
+              '<div class="base-tag">HEX</div>'+
+              '<input class="base-in" id="base-hex" placeholder="FF" oninput="baseConv(\'hex\')" autocorrect="off" autocapitalize="off" spellcheck="false">'+
+            '</div>'+
+            '<div class="base-row">'+
+              '<div class="base-tag">OCT</div>'+
+              '<input class="base-in" id="base-oct" placeholder="377" oninput="baseConv(\'oct\')" autocorrect="off" autocapitalize="off" spellcheck="false">'+
+            '</div>'+
+            '<div class="base-row">'+
+              '<div class="base-tag">BIN</div>'+
+              '<input class="base-in" id="base-bin" placeholder="11111111" oninput="baseConv(\'bin\')" autocorrect="off" autocapitalize="off" spellcheck="false">'+
             '</div>'+
           '</div>'+
-          '<button class="uc-swap" onclick="ucswap('+ci+')" title="Swap units">&#x21C4;</button>'+
-          '<div class="uc-grp">'+
-            '<div class="uc-lbl">To</div>'+
-            '<div class="uc-field">'+
-              '<input class="uc-num" id="ut'+ci+'" type="number" value="" inputmode="decimal" oninput="ucv('+ci+',0)">'+
-              '<select class="uc-sel" id="uT'+ci+'" onchange="ucv('+ci+',1)">'+opts(Math.min(1,cat.u.length-1))+'</select>'+
+        '</div>';
+    } else if(cat.colour){
+      // Colour converter card
+      card.innerHTML=
+        '<div class="uc-head" onclick="togUC('+ci+')">Colour Converter<span class="uc-chev">v</span></div>'+
+        '<div class="uc-inner">'+
+          '<div class="colour-grid">'+
+            '<div class="colour-swatch" id="colour-swatch"></div>'+
+            // HEX
+            '<div class="colour-row">'+
+              '<div class="colour-tag">HEX</div>'+
+              '<input class="colour-in" id="col-hex" placeholder="#3498db" maxlength="9"'+
+                ' oninput="colourConv(\'hex\')" autocorrect="off" autocapitalize="off" spellcheck="false">'+
+            '</div>'+
+            // RGB
+            '<div class="colour-row">'+
+              '<div class="colour-tag">RGB</div>'+
+              '<div class="colour-fields">'+
+                '<div class="colour-field-wrap"><div class="colour-field-lbl">R</div><input class="colour-field-in" id="col-r" type="number" min="0" max="255" inputmode="numeric" placeholder="52" oninput="colourConv(\'rgb\')"></div>'+
+                '<div class="colour-field-wrap"><div class="colour-field-lbl">G</div><input class="colour-field-in" id="col-g" type="number" min="0" max="255" inputmode="numeric" placeholder="152" oninput="colourConv(\'rgb\')"></div>'+
+                '<div class="colour-field-wrap"><div class="colour-field-lbl">B</div><input class="colour-field-in" id="col-b" type="number" min="0" max="255" inputmode="numeric" placeholder="219" oninput="colourConv(\'rgb\')"></div>'+
+              '</div>'+
+            '</div>'+
+            // HSL
+            '<div class="colour-row">'+
+              '<div class="colour-tag">HSL</div>'+
+              '<div class="colour-fields">'+
+                '<div class="colour-field-wrap"><div class="colour-field-lbl">H°</div><input class="colour-field-in" id="col-hl" type="number" min="0" max="360" inputmode="decimal" placeholder="204" oninput="colourConv(\'hsl\')"></div>'+
+                '<div class="colour-field-wrap"><div class="colour-field-lbl">S%</div><input class="colour-field-in" id="col-sl" type="number" min="0" max="100" inputmode="decimal" placeholder="70" oninput="colourConv(\'hsl\')"></div>'+
+                '<div class="colour-field-wrap"><div class="colour-field-lbl">L%</div><input class="colour-field-in" id="col-ll" type="number" min="0" max="100" inputmode="decimal" placeholder="53" oninput="colourConv(\'hsl\')"></div>'+
+              '</div>'+
+            '</div>'+
+            // HSB/HSV
+            '<div class="colour-row">'+
+              '<div class="colour-tag">HSB</div>'+
+              '<div class="colour-fields">'+
+                '<div class="colour-field-wrap"><div class="colour-field-lbl">H°</div><input class="colour-field-in" id="col-hb" type="number" min="0" max="360" inputmode="decimal" placeholder="204" oninput="colourConv(\'hsb\')"></div>'+
+                '<div class="colour-field-wrap"><div class="colour-field-lbl">S%</div><input class="colour-field-in" id="col-sb" type="number" min="0" max="100" inputmode="decimal" placeholder="76" oninput="colourConv(\'hsb\')"></div>'+
+                '<div class="colour-field-wrap"><div class="colour-field-lbl">B%</div><input class="colour-field-in" id="col-bb" type="number" min="0" max="100" inputmode="decimal" placeholder="86" oninput="colourConv(\'hsb\')"></div>'+
+              '</div>'+
+            '</div>'+
+            // CMYK
+            '<div class="colour-row">'+
+              '<div class="colour-tag">CMYK</div>'+
+              '<div class="colour-fields">'+
+                '<div class="colour-field-wrap"><div class="colour-field-lbl">C%</div><input class="colour-field-in" id="col-c" type="number" min="0" max="100" inputmode="decimal" placeholder="76" oninput="colourConv(\'cmyk\')"></div>'+
+                '<div class="colour-field-wrap"><div class="colour-field-lbl">M%</div><input class="colour-field-in" id="col-m" type="number" min="0" max="100" inputmode="decimal" placeholder="31" oninput="colourConv(\'cmyk\')"></div>'+
+                '<div class="colour-field-wrap"><div class="colour-field-lbl">Y%</div><input class="colour-field-in" id="col-y" type="number" min="0" max="100" inputmode="decimal" placeholder="0" oninput="colourConv(\'cmyk\')"></div>'+
+                '<div class="colour-field-wrap"><div class="colour-field-lbl">K%</div><input class="colour-field-in" id="col-k" type="number" min="0" max="100" inputmode="decimal" placeholder="14" oninput="colourConv(\'cmyk\')"></div>'+
+              '</div>'+
             '</div>'+
           '</div>'+
-        '</div>'+
-      '</div>';
-    body.appendChild(card);ucv(ci,1);
+        '</div>';
+    } else {
+      const opts=si=>cat.u.map((u,i)=>'<option value="'+u+'"'+(i===si?' selected':'')+'>'+u+'</option>').join('');
+      card.innerHTML=
+        '<div class="uc-head" onclick="togUC('+ci+')">'+cat.t+'<span class="uc-chev">v</span></div>'+
+        '<div class="uc-inner">'+
+          '<div class="uc-row">'+
+            '<div class="uc-grp">'+
+              '<div class="uc-lbl">From</div>'+
+              '<div class="uc-field">'+
+                '<input class="uc-num" id="uf'+ci+'" type="number" value="1" inputmode="decimal" oninput="ucv('+ci+',1)">'+
+                '<select class="uc-sel" id="us'+ci+'" onchange="ucv('+ci+',1)">'+opts(0)+'</select>'+
+              '</div>'+
+            '</div>'+
+            '<button class="uc-swap" onclick="ucswap('+ci+')" title="Swap units">&#x21C4;</button>'+
+            '<div class="uc-grp">'+
+              '<div class="uc-lbl">To</div>'+
+              '<div class="uc-field">'+
+                '<input class="uc-num" id="ut'+ci+'" type="number" value="" inputmode="decimal" oninput="ucv('+ci+',0)">'+
+                '<select class="uc-sel" id="uT'+ci+'" onchange="ucv('+ci+',1)">'+opts(Math.min(1,cat.u.length-1))+'</select>'+
+              '</div>'+
+            '</div>'+
+          '</div>'+
+        '</div>';
+    }
+    body.appendChild(card);
+    if(!cat.base && !cat.colour) ucv(ci,1);
   });
   document.querySelector('.uc-card').classList.add('open');
 }
+
 function togUC(ci){document.querySelectorAll('.uc-card')[ci].classList.toggle('open');}
+
 function ucv(ci,ft){
   const cat=UC[ci];
+  if(cat.base||cat.colour) return;
   const fi=document.getElementById('uf'+ci),ti=document.getElementById('ut'+ci);
   const fs=document.getElementById('us'+ci).value,ts=document.getElementById('uT'+ci).value;
   if(ft){const v=parseFloat(fi.value);if(isNaN(v)){ti.value='';return;}ti.value=+(cat.sp?ctmp(v,fs,ts):v*cat.b[fs]/cat.b[ts]).toPrecision(8);}
   else{const v=parseFloat(ti.value);if(isNaN(v)){fi.value='';return;}fi.value=+(cat.sp?ctmp(v,ts,fs):v*cat.b[ts]/cat.b[fs]).toPrecision(8);}
 }
+
 function ucswap(ci){
+  const cat=UC[ci]; if(cat.base||cat.colour) return;
   const fi=document.getElementById('uf'+ci),ti=document.getElementById('ut'+ci);
   const fs=document.getElementById('us'+ci),ts=document.getElementById('uT'+ci);
   [fs.value,ts.value]=[ts.value,fs.value];[fi.value,ti.value]=[ti.value,fi.value];ucv(ci,1);
 }
+
+// Base converter: source = 'dec'|'hex'|'oct'|'bin'
+function baseConv(source){
+  const inputs={
+    dec:document.getElementById('base-dec'),
+    hex:document.getElementById('base-hex'),
+    oct:document.getElementById('base-oct'),
+    bin:document.getElementById('base-bin'),
+  };
+  const raw=inputs[source].value.trim().toUpperCase();
+  if(!raw){
+    // Clear all others
+    Object.entries(inputs).forEach(([k,el])=>{ if(k!==source) el.value=''; });
+    return;
+  }
+  // Parse to decimal integer
+  let n;
+  try{
+    if(source==='dec') n=parseInt(raw,10);
+    else if(source==='hex') n=parseInt(raw,16);
+    else if(source==='oct') n=parseInt(raw,8);
+    else if(source==='bin') n=parseInt(raw,2);
+  }catch(e){ n=NaN; }
+
+  if(isNaN(n)||!isFinite(n)){
+    // Invalid — clear others, mark input
+    Object.entries(inputs).forEach(([k,el])=>{ if(k!==source) el.value=''; });
+    inputs[source].style.color='var(--red)';
+    return;
+  }
+  inputs[source].style.color='';
+
+  // Fill all others
+  if(source!=='dec') inputs.dec.value=n.toString(10);
+  if(source!=='hex') inputs.hex.value=n.toString(16).toUpperCase();
+  if(source!=='oct') inputs.oct.value=n.toString(8);
+  if(source!=='bin') inputs.bin.value=n.toString(2);
+}
 buildUC();
+
+// =============================================
+// COLOUR CONVERTER
+// =============================================
+
+// ── Conversion helpers ──
+function hexToRgb(hex){
+  hex=hex.replace(/^#/,'');
+  if(hex.length===3) hex=hex.split('').map(c=>c+c).join('');
+  if(hex.length!==6) return null;
+  const n=parseInt(hex,16);
+  if(isNaN(n)) return null;
+  return{r:(n>>16)&255, g:(n>>8)&255, b:n&255};
+}
+function rgbToHex(r,g,b){
+  return '#'+[r,g,b].map(v=>Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0')).join('').toUpperCase();
+}
+function rgbToHsl(r,g,b){
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h,s,l=(max+min)/2;
+  if(max===min){h=s=0;}
+  else{
+    const d=max-min;
+    s=l>0.5?d/(2-max-min):d/(max+min);
+    if(max===r) h=((g-b)/d+(g<b?6:0))/6;
+    else if(max===g) h=((b-r)/d+2)/6;
+    else h=((r-g)/d+4)/6;
+  }
+  return{h:Math.round(h*360), s:Math.round(s*100), l:Math.round(l*100)};
+}
+function hslToRgb(h,s,l){
+  s/=100; l/=100;
+  const a=s*Math.min(l,1-l);
+  const f=n=>{const k=(n+h/30)%12; return l-a*Math.max(-1,Math.min(k-3,9-k,1));};
+  return{r:Math.round(f(0)*255), g:Math.round(f(8)*255), b:Math.round(f(4)*255)};
+}
+function rgbToHsb(r,g,b){
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
+  let h=0;
+  if(d!==0){
+    if(max===r) h=((g-b)/d%6)/6;
+    else if(max===g) h=((b-r)/d+2)/6;
+    else h=((r-g)/d+4)/6;
+    if(h<0) h+=1;
+  }
+  return{h:Math.round(h*360), s:Math.round((max===0?0:d/max)*100), b:Math.round(max*100)};
+}
+function hsbToRgb(h,s,bv){
+  s/=100; bv/=100;
+  const f=(n,k=(n+h/60)%6)=>bv-bv*s*Math.max(0,Math.min(k,4-k,1));
+  return{r:Math.round(f(5)*255), g:Math.round(f(3)*255), b:Math.round(f(1)*255)};
+}
+function rgbToCmyk(r,g,b){
+  r/=255; g/=255; b/=255;
+  const k=1-Math.max(r,g,b);
+  if(k===1) return{c:0,m:0,y:0,k:100};
+  return{
+    c:Math.round((1-r-k)/(1-k)*100),
+    m:Math.round((1-g-k)/(1-k)*100),
+    y:Math.round((1-b-k)/(1-k)*100),
+    k:Math.round(k*100)
+  };
+}
+function cmykToRgb(c,m,y,k){
+  c/=100; m/=100; y/=100; k/=100;
+  return{
+    r:Math.round(255*(1-c)*(1-k)),
+    g:Math.round(255*(1-m)*(1-k)),
+    b:Math.round(255*(1-y)*(1-k))
+  };
+}
+
+// ── Main colour sync — source tells us which field was edited ──
+function colourConv(source){
+  let rgb=null;
+
+  if(source==='hex'){
+    let h=document.getElementById('col-hex').value.trim();
+    if(!h.startsWith('#')) h='#'+h;
+    rgb=hexToRgb(h);
+  } else if(source==='rgb'){
+    const r=parseFloat(document.getElementById('col-r').value);
+    const g=parseFloat(document.getElementById('col-g').value);
+    const b=parseFloat(document.getElementById('col-b').value);
+    if(!isNaN(r)&&!isNaN(g)&&!isNaN(b)) rgb={r:Math.round(r),g:Math.round(g),b:Math.round(b)};
+  } else if(source==='hsl'){
+    const h=parseFloat(document.getElementById('col-hl').value);
+    const s=parseFloat(document.getElementById('col-sl').value);
+    const l=parseFloat(document.getElementById('col-ll').value);
+    if(!isNaN(h)&&!isNaN(s)&&!isNaN(l)) rgb=hslToRgb(h,s,l);
+  } else if(source==='hsb'){
+    const h=parseFloat(document.getElementById('col-hb').value);
+    const s=parseFloat(document.getElementById('col-sb').value);
+    const b=parseFloat(document.getElementById('col-bb').value);
+    if(!isNaN(h)&&!isNaN(s)&&!isNaN(b)) rgb=hsbToRgb(h,s,b);
+  } else if(source==='cmyk'){
+    const c=parseFloat(document.getElementById('col-c').value);
+    const m=parseFloat(document.getElementById('col-m').value);
+    const y=parseFloat(document.getElementById('col-y').value);
+    const k=parseFloat(document.getElementById('col-k').value);
+    if(!isNaN(c)&&!isNaN(m)&&!isNaN(y)&&!isNaN(k)) rgb=cmykToRgb(c,m,y,k);
+  }
+
+  if(!rgb) return;
+  const {r,g,b}=rgb;
+  colourFill(r,g,b,source);
+}
+
+// Fill all fields from an rgb value, skipping the source field
+function colourFill(r,g,b,skip){
+  const hex=rgbToHex(r,g,b);
+  const hsl=rgbToHsl(r,g,b);
+  const hsb=rgbToHsb(r,g,b);
+  const cmyk=rgbToCmyk(r,g,b);
+
+  if(skip!=='hex') document.getElementById('col-hex').value=hex;
+  if(skip!=='rgb'){
+    document.getElementById('col-r').value=r;
+    document.getElementById('col-g').value=g;
+    document.getElementById('col-b').value=b;
+  }
+  if(skip!=='hsl'){
+    document.getElementById('col-hl').value=hsl.h;
+    document.getElementById('col-sl').value=hsl.s;
+    document.getElementById('col-ll').value=hsl.l;
+  }
+  if(skip!=='hsb'){
+    document.getElementById('col-hb').value=hsb.h;
+    document.getElementById('col-sb').value=hsb.s;
+    document.getElementById('col-bb').value=hsb.b;
+  }
+  if(skip!=='cmyk'){
+    document.getElementById('col-c').value=cmyk.c;
+    document.getElementById('col-m').value=cmyk.m;
+    document.getElementById('col-y').value=cmyk.y;
+    document.getElementById('col-k').value=cmyk.k;
+  }
+
+  // Update swatch
+  const sw=document.getElementById('colour-swatch');
+  if(sw) sw.style.background=hex;
+}
 
 // =============================================
 // PAGE 3 — SCRIPT RUNNER
