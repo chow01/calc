@@ -1,4 +1,4 @@
-const CACHE = 'calcx-v2';
+const CACHE = 'calc';
 const ASSETS = ['./', './index.html', 'https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.0/math.min.js'];
 
 self.addEventListener('install', e =>
