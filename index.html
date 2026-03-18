@@ -27,7 +27,7 @@
   --border:   rgba(30,25,15,0.10);
   --border2:  rgba(30,25,15,0.18);
 
-  /* ── Energy accent — amber/orange (MATLAB warmth + Docker confidence) ── */
+  /* ── Energy accent — amber/orange ── */
   --accent:   #F5820D;
   --accent-d: #D96B00;
   --accent-l: #FFF0E0;
@@ -893,7 +893,7 @@ body {
       <button class="tbb lib" onclick="openLib()">&#9635; Libs</button>
     </div>
     <textarea class="code-ed scroll" id="ced"
-      placeholder="% CalcX Script -- MATLAB-style&#10;% Press Run or Cmd+Enter to execute"
+      placeholder=""
       spellcheck="false" autocorrect="off" autocapitalize="off"
       oninput="saveCurScript()"></textarea>
     <div class="con-wrap" id="cwrap">
@@ -902,7 +902,7 @@ body {
         <span class="con-tog">^</span>
       </div>
       <div class="con-out scroll" id="cout">
-        <div class="ol info">% Ready. Press Run.</div>
+        <div class="ol info">Ready.</div>
       </div>
     </div>
   </div>
@@ -1006,7 +1006,7 @@ function addEq(val='', ph=''){
   eqId++;
   const list=document.getElementById('eq-list');
   const n=list.children.length;
-  const placeholder=ph||(n===0?'x = 15 * 3^(10-2)':n===1?'y = x + 2':n===2?'solve(b), 2*b = a + 1':'solve(z), x*z = y^2 + k');
+  const placeholder=ph||'';
   const block=document.createElement('div');
   block.className='eq-block';
   block.dataset.id=eqId;
@@ -1050,10 +1050,7 @@ function clearSolver(){
   document.getElementById('var-summary').innerHTML='';
   document.getElementById('var-summary').classList.remove('on');
   eqId=0;
-  addEq('x = 15 * 3^(10-2)');
-  addEq('y = x + 2');
-  addEq('solve(b), 2*b = a + 1');
-  addEq('solve(z), x*z = y^2 + k');
+  addEq();
 }
 
 // ── Output format mode: 'auto' | 'fraction' | 'decimal' ──
@@ -1662,7 +1659,7 @@ function colourFill(r,g,b,skip){
 // PAGE 3 — SCRIPT RUNNER
 // =============================================
 let scripts=JSON.parse(localStorage.getItem('cx-scripts')||'null')||[
-  {id:1,name:'main',code:'% CalcX Script Runner\n% MATLAB-style syntax\n\n% Basic math\nx = 42;\ny = x^2 - 100;\ndisp(y)\n\n% Vector\nv = linspace(0, 2*pi, 6);\ndisp(v)\n\n% Loop\nresult = 0;\nfor k = 1:5\n  result = result + k^2;\nend\ndisp(result)\n\n% Matrix\nA = [1 2 3; 4 5 6; 7 8 9];\ndisp(size(A))\ndisp(sum(A))\n'}
+  {id:1,name:'main',code:''}
 ];
 let activeId=scripts[0].id;
 let nextId=Math.max(...scripts.map(s=>s.id))+1;
@@ -1687,7 +1684,7 @@ function renderTabs(){
 function swScript(id){saveCurScript();activeId=id;renderTabs();clearCon();}
 function newScript(){
   saveCurScript();const id=nextId++;
-  scripts.push({id,name:'script'+id,code:'% '+('script'+id)+'\n'});
+  scripts.push({id,name:'script'+id,code:''});
   activeId=id;saveScripts();renderTabs();clearCon();document.getElementById('ced').focus();
 }
 function delScript(id){
@@ -1701,7 +1698,7 @@ renderTabs();
 let conCollapsed=false;
 function togCon(){conCollapsed=!conCollapsed;document.getElementById('cwrap').classList.toggle('col',conCollapsed);}
 function clearCon(){
-  document.getElementById('cout').innerHTML='<div class="ol info">% Ready.</div>';
+  document.getElementById('cout').innerHTML='<div class="ol info">Ready.</div>';
   document.getElementById('cwrap').classList.remove('run-err');
 }
 let _out=null;
@@ -1829,7 +1826,7 @@ function runScript(){
   clearCon();
   if(conCollapsed) togCon();
   const code=document.getElementById('ced').value;
-  appendOut('Running... ('+code.split('\n').length+' lines)','info');
+  appendOut('Running...','info');
   appendOut('','sep');
   _out=appendOut;
   const cwrap=document.getElementById('cwrap');
