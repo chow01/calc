@@ -1,7 +1,7 @@
 {
-  "name": "CalcX",
-  "short_name": "CalcX",
-  "description": "Equation Solver, Unit Converter & MATLAB Script Runner",
+  "name": "Calc",
+  "short_name": "Calc",
+  "description": "Equation Solver, Unit Converter & Script Runner",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
