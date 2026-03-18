@@ -176,7 +176,7 @@ body {
 ══════════════════════════════════════════ */
 #p1 { background: var(--bg); }
 
-.eq-list { flex:1; min-height:0; padding:12px 14px 4px; display:flex; flex-direction:column; gap:0; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.eq-list { flex:1; min-height:0; padding:12px 14px 16px; display:flex; flex-direction:column; gap:0; overflow-y:auto; -webkit-overflow-scrolling:touch; }
 .eq-list::-webkit-scrollbar { display:none; }
 
 @keyframes slidedown {
@@ -191,6 +191,7 @@ body {
 .eq-block {
   display: flex; flex-direction: column;
   margin-bottom: 9px;
+  flex-shrink: 0;
   animation: slidedown 0.2s cubic-bezier(0.22,1,0.36,1);
   border-radius: var(--r);
   box-shadow: 0 1px 3px rgba(30,25,15,0.06), 0 0 0 1.5px var(--border);
@@ -361,14 +362,14 @@ body {
    PAGE 2 — UNIT CONVERTER
 ══════════════════════════════════════════ */
 #p2 { background: var(--bg); }
-.uc-body { flex:1; min-height:0; padding:10px 14px; gap:8px; display:flex; flex-direction:column; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.uc-body { flex:1; min-height:0; padding:10px 14px 24px; gap:8px; display:flex; flex-direction:column; overflow-y:auto; -webkit-overflow-scrolling:touch; }
 .uc-body::-webkit-scrollbar { display:none; }
 
 .uc-card {
   background: var(--s1);
   border: 1.5px solid var(--border);
   border-radius: var(--r);
-  overflow:hidden;
+  flex-shrink: 0;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .uc-card.open {
